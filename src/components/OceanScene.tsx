@@ -10,11 +10,12 @@ import {
   useScroll,
 } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { ReactNode, useMemo, useRef } from 'react'
+import { ReactNode, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 type OceanSceneProps = {
   children: ReactNode
+  reducedMotion: boolean
 }
 
 type Vec3Tuple = [number, number, number]
@@ -91,18 +92,20 @@ function sampleCameraPath(offset: number) {
   }
 }
 
-function CameraRig() {
+function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
   const scroll = useScroll()
   const lookTarget = useRef(new THREE.Vector3(0, 0, 0))
 
   useFrame((state, delta) => {
-    const drift = Math.sin(state.clock.elapsedTime * 0.2) * 0.015
     const sample = sampleCameraPath(scroll.offset)
-    const easing = 1 - Math.exp(-delta * 2.4)
+    const easing = reducedMotion ? 1 : 1 - Math.exp(-delta * 2.4)
 
-    sample.position.x += Math.sin(state.clock.elapsedTime * 0.16) * 0.5
-    sample.position.y += drift
-    sample.target.x += Math.cos(state.clock.elapsedTime * 0.14) * 0.35
+    if (!reducedMotion) {
+      const drift = Math.sin(state.clock.elapsedTime * 0.2) * 0.015
+      sample.position.x += Math.sin(state.clock.elapsedTime * 0.16) * 0.5
+      sample.position.y += drift
+      sample.target.x += Math.cos(state.clock.elapsedTime * 0.14) * 0.35
+    }
 
     state.camera.position.lerp(sample.position, easing)
     lookTarget.current.lerp(sample.target, easing)
@@ -198,7 +201,7 @@ function DataStreams() {
   )
 }
 
-function KnowledgeNodes() {
+function KnowledgeNodes({ reducedMotion }: { reducedMotion: boolean }) {
   const positions = useMemo<Vec3Tuple[]>(
     () => [
       [-5.2, -12.6, -10],
@@ -241,9 +244,9 @@ function KnowledgeNodes() {
       {positions.map((position, index) => (
         <Float
           key={`node-${index}`}
-          speed={0.9 + index * 0.08}
-          rotationIntensity={0.16}
-          floatIntensity={0.35}
+          speed={reducedMotion ? 0 : 0.9 + index * 0.08}
+          rotationIntensity={reducedMotion ? 0 : 0.16}
+          floatIntensity={reducedMotion ? 0 : 0.35}
         >
           <mesh position={position}>
             <sphereGeometry args={[0.18, 18, 18]} />
@@ -261,7 +264,7 @@ function KnowledgeNodes() {
   )
 }
 
-function AlgorithmForms() {
+function AlgorithmForms({ reducedMotion }: { reducedMotion: boolean }) {
   const forms = useMemo(
     () => [
       { position: [-7.5, -9.6, -12] as [number, number, number], scale: 1.6 },
@@ -277,9 +280,9 @@ function AlgorithmForms() {
       {forms.map((form, index) => (
         <Float
           key={`form-${index}`}
-          speed={0.6 + index * 0.18}
-          rotationIntensity={0.26}
-          floatIntensity={0.5}
+          speed={reducedMotion ? 0 : 0.6 + index * 0.18}
+          rotationIntensity={reducedMotion ? 0 : 0.26}
+          floatIntensity={reducedMotion ? 0 : 0.5}
         >
           <mesh position={form.position} scale={form.scale}>
             <icosahedronGeometry args={[0.55, 0]} />
@@ -291,7 +294,7 @@ function AlgorithmForms() {
   )
 }
 
-function BubbleField() {
+function BubbleField({ reducedMotion }: { reducedMotion: boolean }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const particles = useMemo(
     () =>
@@ -314,8 +317,10 @@ function BubbleField() {
     }
 
     particles.forEach((particle, index) => {
-      particle.y += particle.speed * delta * 6
-      particle.x += Math.sin(state.clock.elapsedTime * 0.3 + index) * particle.drift * delta * 0.25
+      if (!reducedMotion) {
+        particle.y += particle.speed * delta * 6
+        particle.x += Math.sin(state.clock.elapsedTime * 0.3 + index) * particle.drift * delta * 0.25
+      }
 
       if (particle.y > 2) {
         particle.y = -24
@@ -338,7 +343,7 @@ function BubbleField() {
   )
 }
 
-function CodeFragments() {
+function CodeFragments({ reducedMotion }: { reducedMotion: boolean }) {
   const fragments = useMemo(
     () => [
       { text: 'def solve(depth):', position: [-7.5, -7.5, -11] as [number, number, number] },
@@ -353,7 +358,11 @@ function CodeFragments() {
   return (
     <group>
       {fragments.map((fragment, index) => (
-        <Float key={`fragment-${index}`} speed={0.8 + index * 0.1} floatIntensity={0.45}>
+        <Float
+          key={`fragment-${index}`}
+          speed={reducedMotion ? 0 : 0.8 + index * 0.1}
+          floatIntensity={reducedMotion ? 0 : 0.45}
+        >
           <Text
             position={fragment.position}
             fontSize={0.38}
@@ -419,10 +428,14 @@ function LightColumns() {
   )
 }
 
-function SceneContent() {
+function SceneContent({
+  reducedMotion,
+}: {
+  reducedMotion: boolean
+}) {
   return (
     <>
-      <CameraRig />
+      <CameraRig reducedMotion={reducedMotion} />
 
       <ambientLight intensity={0.72} color="#94d8ff" />
       <hemisphereLight intensity={0.48} color="#c8ebff" groundColor="#02111f" />
@@ -448,29 +461,67 @@ function SceneContent() {
       <SurfaceWater />
       <LightColumns />
       <DataStreams />
-      <KnowledgeNodes />
-      <AlgorithmForms />
-      <BubbleField />
-      <CodeFragments />
+      <KnowledgeNodes reducedMotion={reducedMotion} />
+      <AlgorithmForms reducedMotion={reducedMotion} />
+      <BubbleField reducedMotion={reducedMotion} />
+      <CodeFragments reducedMotion={reducedMotion} />
       <DigitalFloor />
     </>
   )
 }
 
-export function OceanScene({ children }: OceanSceneProps) {
+function supportsWebGL() {
+  try {
+    const canvas = document.createElement('canvas')
+    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'))
+  } catch {
+    return false
+  }
+}
+
+function StaticSceneFallback({ children }: { children: ReactNode }) {
+  return (
+    <div className="experience-shell static-fallback-shell">
+      <div className="scene-fallback-banner" role="status" aria-live="polite">
+        Simplified visual mode is active for smoother performance.
+      </div>
+      {children}
+    </div>
+  )
+}
+
+export function OceanScene({ children, reducedMotion }: OceanSceneProps) {
+  const [useFallback, setUseFallback] = useState(!supportsWebGL())
+  const [sceneReady, setSceneReady] = useState(false)
+
+  useEffect(() => {
+    document.body.style.overflow = useFallback ? 'auto' : 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [useFallback])
+
+  if (useFallback) {
+    return <StaticSceneFallback>{children}</StaticSceneFallback>
+  }
+
   return (
     <div className="experience-shell">
+      {!sceneReady ? <div className="scene-loader">Loading cinematic environment...</div> : null}
       <Canvas
         dpr={[1, 1.75]}
         camera={{ position: [0, 4.5, 13], fov: 42, near: 0.1, far: 180 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
+        onCreated={() => setSceneReady(true)}
       >
-        <ScrollControls pages={7} damping={0.18} maxSpeed={0.2}>
-          <SceneContent />
-          <Scroll html style={{ width: '100%' }}>
-            {children}
-          </Scroll>
-        </ScrollControls>
+        <Suspense fallback={null}>
+          <ScrollControls pages={7} damping={0.18} maxSpeed={reducedMotion ? 0.08 : 0.2}>
+            <SceneContent reducedMotion={reducedMotion} />
+            <Scroll html style={{ width: '100%' }}>
+              {children}
+            </Scroll>
+          </ScrollControls>
+        </Suspense>
       </Canvas>
     </div>
   )

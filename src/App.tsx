@@ -1,10 +1,10 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { OceanScene } from './components/OceanScene'
 import { TypingText } from './components/TypingText'
 import {
   contactCards,
-  experienceLines,
+  experienceEntries,
   projects,
   skillLinks,
   skillNodePositions,
@@ -35,9 +35,19 @@ function ContactIcon({ id }: { id: string }) {
   return icons[id] ?? null
 }
 
-function Section({ className, children }: { className?: string; children: ReactNode }) {
+function Section({
+  className,
+  children,
+  id,
+  ariaLabel,
+}: {
+  className?: string
+  children: ReactNode
+  id?: string
+  ariaLabel?: string
+}) {
   return (
-    <section className={`page-section ${className ?? ''}`.trim()}>
+    <section id={id} aria-label={ariaLabel} className={`page-section ${className ?? ''}`.trim()}>
       <div className="section-inner">{children}</div>
     </section>
   )
@@ -49,8 +59,115 @@ function linkClickGuard(event: MouseEvent<HTMLAnchorElement>, href: string) {
   }
 }
 
+function CaseStudyPage({ onBack }: { onBack: () => void }) {
+  return (
+    <main className="case-study-shell" aria-label="Deep-dive case study">
+      <section className="case-study-wrap">
+        <p className="eyebrow">Case Study</p>
+        <h1>Digital Depth Portfolio System</h1>
+        <p className="case-study-intro">
+          A cinematic engineering portfolio designed to communicate technical depth, architecture thinking,
+          and product storytelling in one coherent experience.
+        </p>
+
+        <div className="case-study-grid">
+          <article className="glass-panel compact-panel">
+            <h2>Architecture Decisions</h2>
+            <ul className="case-study-list">
+              <li>Separated content data in structured modules to keep UI rendering clean and scalable.</li>
+              <li>Used React Three Fiber + Drei to combine declarative React patterns with real-time 3D scenes.</li>
+              <li>Designed section primitives for reuse across About, Skills, Projects, Resume, and Contact.</li>
+            </ul>
+          </article>
+
+          <article className="glass-panel compact-panel">
+            <h2>Tradeoffs</h2>
+            <ul className="case-study-list">
+              <li>Visual richness increased render cost, so performance monitors and graceful fallback were added.</li>
+              <li>Scroll-driven camera improved storytelling but required reduced-motion support for accessibility.</li>
+              <li>Custom layout identity was prioritized over template speed, increasing implementation effort.</li>
+            </ul>
+          </article>
+
+          <article className="glass-panel compact-panel">
+            <h2>Lessons Learned</h2>
+            <ul className="case-study-list">
+              <li>Outcome-focused project narratives convert better than feature-only descriptions.</li>
+              <li>Accessibility is most effective when built alongside animation and interaction design.</li>
+              <li>Progressive enhancement keeps visual ambition without excluding lower-end devices.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div className="resume-actions">
+          <button type="button" className="action-button primary" onClick={onBack}>
+            Back To Homepage
+          </button>
+          <a className="action-button secondary" href="https://github.com/RakatiVenukumar/3D-Portfolio">
+            View Repository
+          </a>
+        </div>
+      </section>
+    </main>
+  )
+}
+
 export default function App() {
   const [activeProject, setActiveProject] = useState<ProjectModalItem | null>(null)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const [showCaseStudy, setShowCaseStudy] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  const openCaseStudy = () => {
+    const nextUrl = new URL(window.location.href)
+    nextUrl.searchParams.set('case-study', 'digital-depth')
+    window.history.pushState({}, '', nextUrl)
+    setShowCaseStudy(true)
+  }
+
+  const closeCaseStudy = () => {
+    const nextUrl = new URL(window.location.href)
+    nextUrl.searchParams.delete('case-study')
+    window.history.pushState({}, '', nextUrl)
+    setShowCaseStudy(false)
+  }
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const syncPreference = () => setReducedMotion(mediaQuery.matches)
+    syncPreference()
+
+    mediaQuery.addEventListener('change', syncPreference)
+    return () => mediaQuery.removeEventListener('change', syncPreference)
+  }, [])
+
+  useEffect(() => {
+    const syncCaseStudyState = () => {
+      const params = new URLSearchParams(window.location.search)
+      setShowCaseStudy(params.get('case-study') === 'digital-depth')
+    }
+
+    syncCaseStudyState()
+    window.addEventListener('popstate', syncCaseStudyState)
+    return () => window.removeEventListener('popstate', syncCaseStudyState)
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveProject(null)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  useEffect(() => {
+    if (activeProject && modalRef.current) {
+      modalRef.current.focus()
+    }
+  }, [activeProject])
 
   const skillNodes = useMemo(
     () =>
@@ -58,10 +175,10 @@ export default function App() {
         const position = skillNodePositions[index]!
 
         return {
-        skill,
-        x: position.x,
-        y: position.y,
-      }
+          skill,
+          x: position.x,
+          y: position.y,
+        }
       }),
     [],
   )
@@ -76,11 +193,21 @@ export default function App() {
     [skillNodes],
   )
 
+  const contactMeta: Record<string, string> = {
+    github: 'Best for code reviews, collaboration, and project history.',
+    linkedin: 'Best for role opportunities and professional conversations.',
+    email: 'Best for direct inquiries, interviews, and quick follow-ups.',
+  }
+
+  if (showCaseStudy) {
+    return <CaseStudyPage onBack={closeCaseStudy} />
+  }
+
   return (
     <>
-      <OceanScene>
+      <OceanScene reducedMotion={reducedMotion}>
         <div className="page-shell">
-          <Section className="hero-section">
+          <Section id="hero" ariaLabel="Hero section" className="hero-section">
             <div className="hero-copy">
               <p className="eyebrow">Digital Ocean Portfolio</p>
               <div className="hero-title-wrap">
@@ -95,10 +222,21 @@ export default function App() {
                 <span>Calm surface</span>
                 <span>Scroll to descend</span>
               </div>
+              <div className="hero-actions">
+                <a href="#resume" className="action-button primary">
+                  View Resume
+                </a>
+                <a href="#contact" className="action-button secondary">
+                  Contact Me
+                </a>
+                <button type="button" className="action-button secondary" onClick={openCaseStudy}>
+                  Case Study
+                </button>
+              </div>
             </div>
           </Section>
 
-          <Section className="about-section">
+          <Section id="about" ariaLabel="About section" className="about-section">
             <div className="glass-panel panel-wide">
               <p className="eyebrow">About</p>
               <h2>Developer thinking translated into an ocean of systems, structure, and curiosity.</h2>
@@ -114,7 +252,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section className="skills-section">
+          <Section id="skills" ariaLabel="Skills section" className="skills-section">
             <div className="glass-panel panel-skill-network">
               <div className="panel-header">
                 <p className="eyebrow">Skills</p>
@@ -151,10 +289,16 @@ export default function App() {
                   </button>
                 ))}
               </div>
+
+              <ul className="skill-list-mobile" aria-label="Skills list for mobile screens">
+                {skills.map((skill) => (
+                  <li key={skill}>{skill}</li>
+                ))}
+              </ul>
             </div>
           </Section>
 
-          <Section className="projects-section">
+          <Section id="projects" ariaLabel="Projects section" className="projects-section">
             <div className="section-split">
               <div className="section-copy glass-panel compact-panel">
                 <p className="eyebrow">Projects</p>
@@ -177,6 +321,7 @@ export default function App() {
                     <span className="project-card-glow" aria-hidden="true" />
                     <span className="project-card-label">Knowledge Vault 0{index + 1}</span>
                     <strong>{project.title}</strong>
+                    <span className="project-outcome">{project.result}</span>
                     <span>{project.technologies.join(' · ')}</span>
                   </button>
                 ))}
@@ -184,7 +329,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section className="experience-section">
+          <Section id="experience" ariaLabel="Experience section" className="experience-section">
             <div className="glass-panel terminal-panel">
               <div className="terminal-topbar">
                 <span />
@@ -193,11 +338,11 @@ export default function App() {
               </div>
               <p className="eyebrow">Experience</p>
               <h2>Learning journey rendered as a submerged terminal.</h2>
-              <TypingText lines={experienceLines} />
+              <TypingText lines={experienceEntries} reducedMotion={reducedMotion} />
             </div>
           </Section>
 
-          <Section className="resume-section">
+          <Section id="resume" ariaLabel="Resume section" className="resume-section">
             <div className="glass-panel resume-panel">
               <p className="eyebrow">Resume</p>
               <h2>A glowing archive container with multiple access paths.</h2>
@@ -216,14 +361,17 @@ export default function App() {
             </div>
           </Section>
 
-          <Section className="contact-section">
-            <div className="section-split contact-layout">
-              <div className="glass-panel compact-panel">
+          <Section id="contact" ariaLabel="Contact section" className="contact-section">
+            <div className="contact-layout">
+              <div className="glass-panel contact-panel">
                 <p className="eyebrow">Contact</p>
-                <h2>Ascending back toward the surface with a minimal contact interface.</h2>
-                <p>
-                  Replace the placeholder destinations below with your live GitHub, LinkedIn, email, and resume
-                  endpoints before deployment.
+                <div className="contact-title-row">
+                  <h2>Let&apos;s build something meaningful together.</h2>
+                  <span className="contact-status">Open to opportunities</span>
+                </div>
+                <p className="contact-note">
+                  Choose the channel that matches your intent. Code discussions, hiring conversations, and direct
+                  outreach each have a fast path below.
                 </p>
               </div>
 
@@ -234,12 +382,19 @@ export default function App() {
                     href={card.href}
                     className="contact-card"
                     onClick={(event) => linkClickGuard(event, card.href)}
+                    aria-label={`${card.label}: ${card.subtitle}`}
                   >
-                    <span className="contact-icon">
-                      <ContactIcon id={card.id} />
-                    </span>
+                    <div className="contact-card-top">
+                      <span className="contact-icon">
+                        <ContactIcon id={card.id} />
+                      </span>
+                      <span className="contact-card-arrow" aria-hidden="true">
+                        {'->'}
+                      </span>
+                    </div>
                     <strong>{card.label}</strong>
                     <span>{card.subtitle}</span>
+                    <small>{contactMeta[card.id] ?? 'Connect here for portfolio-related discussion.'}</small>
                   </a>
                 ))}
               </div>
@@ -255,14 +410,37 @@ export default function App() {
 
       {activeProject ? (
         <div className="project-modal-backdrop" onClick={() => setActiveProject(null)}>
-          <div className="project-modal" onClick={(event) => event.stopPropagation()}>
-            <button type="button" className="modal-close" onClick={() => setActiveProject(null)}>
-              Close
+          <div
+            ref={modalRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${activeProject.title} details`}
+            className="project-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="modal-close"
+              aria-label="Close project modal"
+              onClick={() => setActiveProject(null)}
+            >
+              ×
             </button>
             <p className="eyebrow">Project Display</p>
             <h3>{activeProject.title}</h3>
-            <p>{activeProject.description}</p>
-            <p className="project-insight">{activeProject.insight}</p>
+            <p>{activeProject.summary}</p>
+            <div className="project-detail-blocks">
+              <p>
+                <strong>Problem:</strong> {activeProject.problem}
+              </p>
+              <p>
+                <strong>What I Built:</strong> {activeProject.built}
+              </p>
+              <p className="project-insight">
+                <strong>Measurable Result:</strong> {activeProject.result}
+              </p>
+            </div>
             <div className="project-tech-list">
               {activeProject.technologies.map((tech) => (
                 <span key={tech}>{tech}</span>
@@ -283,6 +461,9 @@ export default function App() {
               >
                 Demo Link
               </a>
+              <button type="button" className="action-button secondary" onClick={openCaseStudy}>
+                View Deep-Dive
+              </button>
             </div>
           </div>
         </div>

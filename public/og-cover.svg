@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Rakati Venu Kumar Digital Ocean Portfolio</title>
+  <desc id="desc">Cinematic software engineering portfolio cover image.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#031022" />
+      <stop offset="55%" stop-color="#07203f" />
+      <stop offset="100%" stop-color="#0b3e66" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.18" cy="0.12" r="0.7">
+      <stop offset="0%" stop-color="#4fd8ff" stop-opacity="0.42" />
+      <stop offset="100%" stop-color="#4fd8ff" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+  <g fill="none" stroke="rgba(98, 224, 255, 0.35)">
+    <path d="M0 420 C220 360, 380 500, 620 430 C840 360, 980 470, 1200 410" stroke-width="2" />
+    <path d="M0 455 C240 395, 420 540, 640 470 C860 395, 1020 525, 1200 455" stroke-width="1.5" />
+  </g>
+  <circle cx="980" cy="140" r="100" fill="rgba(79, 216, 255, 0.12)" />
+  <text x="88" y="240" fill="#eaf8ff" font-size="58" font-family="Bahnschrift, Segoe UI, sans-serif" letter-spacing="1.5">
+    Rakati Venu Kumar
+  </text>
+  <text x="88" y="306" fill="#9de9ff" font-size="34" font-family="Bahnschrift, Segoe UI, sans-serif" letter-spacing="3">
+    DIGITAL OCEAN PORTFOLIO
+  </text>
+  <text x="88" y="366" fill="#d2efff" font-size="28" font-family="Consolas, monospace">
+    Engineering depth through cinematic systems.
+  </text>
+</svg>

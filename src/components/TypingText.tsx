@@ -1,15 +1,27 @@
 import { useEffect, useMemo, useState } from 'react'
 
-type TypingTextProps = {
-  lines: string[]
-  speed?: number
+type TypingLine = {
+  line: string
+  href: string
+  label: string
 }
 
-export function TypingText({ lines, speed = 26 }: TypingTextProps) {
-  const fullText = useMemo(() => lines.join('\n'), [lines])
+type TypingTextProps = {
+  lines: TypingLine[]
+  speed?: number
+  reducedMotion?: boolean
+}
+
+export function TypingText({ lines, speed = 26, reducedMotion = false }: TypingTextProps) {
+  const fullText = useMemo(() => lines.map((entry) => entry.line).join('\n'), [lines])
   const [visibleChars, setVisibleChars] = useState(0)
 
   useEffect(() => {
+    if (reducedMotion) {
+      setVisibleChars(fullText.length)
+      return
+    }
+
     setVisibleChars(0)
 
     const timer = window.setInterval(() => {
@@ -24,12 +36,26 @@ export function TypingText({ lines, speed = 26 }: TypingTextProps) {
     }, speed)
 
     return () => window.clearInterval(timer)
-  }, [fullText, speed])
+  }, [fullText, reducedMotion, speed])
+
+  const isDone = visibleChars >= fullText.length
 
   return (
-    <pre className="terminal-output">
-      {fullText.slice(0, visibleChars)}
-      <span className="terminal-caret">|</span>
-    </pre>
+    <div>
+      <pre className="terminal-output">
+        {fullText.slice(0, visibleChars)}
+        <span className="terminal-caret" aria-hidden="true">
+          |
+        </span>
+      </pre>
+
+      <div className={`terminal-links ${isDone ? 'is-visible' : ''}`}>
+        {lines.map((entry) => (
+          <a key={entry.line} href={entry.href} className="terminal-link" aria-label={entry.label}>
+            {entry.label}
+          </a>
+        ))}
+      </div>
+    </div>
   )
 }

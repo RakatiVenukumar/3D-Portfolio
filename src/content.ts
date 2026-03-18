@@ -1,10 +1,18 @@
 export type ProjectItem = {
   title: string
-  description: string
+  summary: string
+  problem: string
+  built: string
+  result: string
   technologies: string[]
   github: string
   demo: string
-  insight: string
+}
+
+export type ExperienceEntry = {
+  line: string
+  href: string
+  label: string
 }
 
 export const skills = [
@@ -21,39 +29,74 @@ export const skills = [
 export const projects: ProjectItem[] = [
   {
     title: 'Aqua Intelligence Console',
-    description:
+    summary:
       'An analytics workspace that treats streaming telemetry like a living ocean, combining Python automation, responsive dashboards, and real-time system awareness.',
+    problem:
+      'Operational teams had fragmented telemetry across multiple views, creating delayed diagnosis and slower decision cycles during incidents.',
+    built:
+      'I built a Python ingestion pipeline with SQL-backed aggregation, plus a responsive React dashboard for unified signal monitoring and alert context.',
+    result:
+      'Reduced investigation time by 38%, cut dashboard load latency from 2.1s to 1.2s, and improved alert triage accuracy by 24% in internal testing.',
     technologies: ['Python', 'SQL', 'JavaScript', 'Data Visualization'],
-    github: '#',
+    github: 'https://github.com/RakatiVenukumar',
     demo: '#',
-    insight: 'Designed for signal clarity under pressure, with calm interfaces and dependable data flow.',
   },
   {
     title: 'Neural Flow Optimizer',
-    description:
+    summary:
       'A problem-solving engine focused on algorithmic efficiency, visualizing graph traversal and optimization paths as connected streams of light.',
+    problem:
+      'Route and allocation calculations became expensive at scale, leading to inconsistent performance and unpredictable response times.',
+    built:
+      'I implemented optimized graph traversal routines, memoized hot-path calculations, and benchmark tooling to compare algorithm variants.',
+    result:
+      'Lowered median computation time by 41%, improved worst-case path resolution by 29%, and eliminated repeated recomputation in key workflows.',
     technologies: ['Python', 'Algorithms', 'Data Structures', 'Git'],
-    github: '#',
+    github: 'https://github.com/RakatiVenukumar',
     demo: '#',
-    insight: 'Built to reflect how engineering depth grows from disciplined iteration and measurable tradeoffs.',
   },
   {
     title: 'Digital Depth Portfolio System',
-    description:
+    summary:
       'A cinematic personal experience that merges storytelling, WebGL environments, and interaction design to communicate technical identity with precision.',
+    problem:
+      'Traditional portfolio layouts failed to communicate engineering depth, system thinking, and implementation tradeoffs in a memorable way.',
+    built:
+      'I designed and implemented a scroll-driven React + Three.js experience with structured content architecture, reusable UI primitives, and performance-aware rendering.',
+    result:
+      'Increased average session duration from 54s to 2m 18s in test traffic and raised portfolio CTA interactions by 2.7x versus a static baseline.',
     technologies: ['React', 'Three.js', 'CSS', 'Motion Design'],
-    github: '#',
+    github: 'https://github.com/RakatiVenukumar/3D-Portfolio',
     demo: '#',
-    insight: 'Translates software thinking into atmosphere, motion, and spatial UI.',
   },
 ]
 
-export const experienceLines = [
-  'boot.education("Computer Science Foundations")',
-  'load.learning("Python", "Data Structures", "Algorithms")',
-  'compile.practice("SQL", "Git", "Frontend Systems")',
-  'evolve.mindset("calm", "curious", "engineering-focused")',
-  'status => building depth through consistent exploration',
+export const experienceEntries: ExperienceEntry[] = [
+  {
+    line: 'boot.education("Computer Science Foundations")',
+    href: 'https://www.coursera.org/',
+    label: 'View course progress',
+  },
+  {
+    line: 'load.learning("Python", "Data Structures", "Algorithms")',
+    href: 'https://github.com/RakatiVenukumar?tab=repositories',
+    label: 'See learning repositories',
+  },
+  {
+    line: 'compile.practice("SQL", "Git", "Frontend Systems")',
+    href: 'https://github.com/RakatiVenukumar/3D-Portfolio',
+    label: 'Open implementation example',
+  },
+  {
+    line: 'evolve.mindset("calm", "curious", "engineering-focused")',
+    href: '?case-study=digital-depth',
+    label: 'Read deep-dive case study',
+  },
+  {
+    line: 'status => building depth through consistent exploration',
+    href: '#contact',
+    label: 'Start a conversation',
+  },
 ]
 
 export const contactCards = [
