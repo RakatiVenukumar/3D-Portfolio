@@ -515,7 +515,7 @@ export function OceanScene({ children, reducedMotion }: OceanSceneProps) {
         onCreated={() => setSceneReady(true)}
       >
         <Suspense fallback={null}>
-          <ScrollControls pages={7} damping={0.18} maxSpeed={reducedMotion ? 0.08 : 0.2}>
+          <ScrollControls pages={7.5} damping={0.18} maxSpeed={reducedMotion ? 0.08 : 0.2}>
             <SceneContent reducedMotion={reducedMotion} />
             <Scroll html style={{ width: '100%' }}>
               {children}

@@ -198,6 +198,7 @@ export default function App() {
     linkedin: 'Best for role opportunities and professional conversations.',
     email: 'Best for direct inquiries, interviews, and quick follow-ups.',
   }
+  const currentYear = new Date().getFullYear()
 
   if (showCaseStudy) {
     return <CaseStudyPage onBack={closeCaseStudy} />
@@ -399,6 +400,43 @@ export default function App() {
                 ))}
               </div>
             </div>
+
+            <footer className="site-footer glass-panel" aria-label="Portfolio footer">
+              <div className="site-footer-main">
+                <div>
+                  <p className="footer-eyebrow">Portfolio Footer</p>
+                  <p className="footer-title">Rakati Venu Kumar</p>
+                  <p className="footer-subtitle">Python Developer | Software Engineer</p>
+                </div>
+
+                <nav className="footer-nav" aria-label="Footer navigation">
+                  <a href="#about">About</a>
+                  <a href="#projects">Projects</a>
+                  <a href="#experience">Experience</a>
+                  <a href="#contact">Contact</a>
+                </nav>
+
+                <div className="footer-socials">
+                  {contactCards.map((card) => (
+                    <a
+                      key={`footer-${card.id}`}
+                      href={card.href}
+                      aria-label={card.label}
+                      onClick={(event) => linkClickGuard(event, card.href)}
+                    >
+                      <span className="contact-icon" aria-hidden="true">
+                        <ContactIcon id={card.id} />
+                      </span>
+                      <span>{card.label}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <p className="footer-copy">
+                © {currentYear} Rakati Venu Kumar. Designed with cinematic depth and engineered with React + Three.js.
+              </p>
+            </footer>
           </Section>
         </div>
       </OceanScene>
