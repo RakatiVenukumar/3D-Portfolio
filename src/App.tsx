@@ -2,6 +2,8 @@ import type { CSSProperties, MouseEvent, ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { OceanScene } from './components/OceanScene'
 import { TypingText } from './components/TypingText'
+import { ContactForm } from './components/ContactForm'
+import { LoadingSpinner } from './components/LoadingSpinner'
 import {
   contactCards,
   experienceEntries,
@@ -10,6 +12,7 @@ import {
   skillNodePositions,
   skills,
 } from './content'
+import { analytics } from './utils/analytics'
 
 type ProjectModalItem = (typeof projects)[number]
 
@@ -56,6 +59,21 @@ function Section({
 function linkClickGuard(event: MouseEvent<HTMLAnchorElement>, href: string) {
   if (href === '#') {
     event.preventDefault()
+  }
+}
+
+function smoothScrollToAnchor(event: React.MouseEvent<HTMLAnchorElement>) {
+  const href = event.currentTarget.getAttribute('href')
+  if (href?.startsWith('#')) {
+    event.preventDefault()
+    const target = document.querySelector(href)
+    if (target) {
+      const offsetTop = target.getBoundingClientRect().top + window.scrollY - 80
+      window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth',
+      })
+    }
   }
 }
 
@@ -116,7 +134,9 @@ export default function App() {
   const [activeProject, setActiveProject] = useState<ProjectModalItem | null>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [showCaseStudy, setShowCaseStudy] = useState(false)
+  const [showLoadingSpinner, setShowLoadingSpinner] = useState(true)
   const modalRef = useRef<HTMLDivElement>(null)
+  const sectionObserverRef = useRef<IntersectionObserver | null>(null)
 
   const openCaseStudy = () => {
     const nextUrl = new URL(window.location.href)
@@ -139,6 +159,61 @@ export default function App() {
 
     mediaQuery.addEventListener('change', syncPreference)
     return () => mediaQuery.removeEventListener('change', syncPreference)
+  }, [])
+
+  useEffect(() => {
+    // Hide loading spinner after scene loads
+    const timer = setTimeout(() => setShowLoadingSpinner(false), 2400)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    // Track page view
+    analytics.trackPageView(window.location.pathname)
+  }, [])
+
+  useEffect(() => {
+    // Track scroll progress and depth
+    const handleScroll = () => {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = docHeight > 0 ? scrollTop / docHeight : 0
+      analytics.trackScrollDepth(progress * 100)
+    }
+
+    let ticking = false
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(handleScroll)
+        ticking = true
+      }
+    })
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    // Track section views with Intersection Observer
+    if (sectionObserverRef.current) {
+      sectionObserverRef.current.disconnect()
+    }
+
+    sectionObserverRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id
+          if (sectionId) {
+            analytics.trackSectionView(sectionId)
+          }
+        }
+      })
+    })
+
+    document.querySelectorAll('.page-section').forEach((el) => {
+      sectionObserverRef.current?.observe(el)
+    })
+
+    return () => sectionObserverRef.current?.disconnect()
   }, [])
 
   useEffect(() => {
@@ -206,6 +281,7 @@ export default function App() {
 
   return (
     <>
+      {showLoadingSpinner && <LoadingSpinner />}
       <OceanScene reducedMotion={reducedMotion}>
         <div className="page-shell">
           <Section id="hero" ariaLabel="Hero section" className="hero-section">
@@ -224,13 +300,34 @@ export default function App() {
                 <span>Scroll to descend</span>
               </div>
               <div className="hero-actions">
-                <a href="#resume" className="action-button primary">
+                <a 
+                  href="#resume" 
+                  className="action-button primary"
+                  onClick={(e) => {
+                    smoothScrollToAnchor(e)
+                    analytics.trackClick('view_resume', 'View Resume')
+                  }}
+                >
                   View Resume
                 </a>
-                <a href="#contact" className="action-button secondary">
+                <a 
+                  href="#contact" 
+                  className="action-button secondary"
+                  onClick={(e) => {
+                    smoothScrollToAnchor(e)
+                    analytics.trackClick('contact_me', 'Contact Me')
+                  }}
+                >
                   Contact Me
                 </a>
-                <button type="button" className="action-button secondary" onClick={openCaseStudy}>
+                <button 
+                  type="button" 
+                  className="action-button secondary" 
+                  onClick={() => {
+                    openCaseStudy()
+                    analytics.trackClick('case_study', 'Case Study')
+                  }}
+                >
                   Case Study
                 </button>
               </div>
@@ -316,7 +413,10 @@ export default function App() {
                     key={project.title}
                     type="button"
                     className="project-card"
-                    onClick={() => setActiveProject(project)}
+                    onClick={() => {
+                      setActiveProject(project)
+                      analytics.trackProjectView(project.title)
+                    }}
                     style={{ animationDelay: `${index * 0.12}s` }}
                   >
                     <span className="project-card-glow" aria-hidden="true" />
@@ -324,6 +424,14 @@ export default function App() {
                     <strong>{project.title}</strong>
                     <span className="project-outcome">{project.result}</span>
                     <span>{project.technologies.join(' · ')}</span>
+                    <div className="project-card-meta">
+                      <span className="project-date">{project.date}</span>
+                      {project.badges.map((badge) => (
+                        <span key={badge} className={`project-badge badge-${badge.toLowerCase().replace(' ', '-')}`}>
+                          {badge}
+                        </span>
+                      ))}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -377,12 +485,15 @@ export default function App() {
               </div>
 
               <div className="contact-grid">
-                {contactCards.map((card) => (
+                {contactCards.filter(card => card.id !== 'email').map((card) => (
                   <a
                     key={card.id}
                     href={card.href}
                     className="contact-card"
-                    onClick={(event) => linkClickGuard(event, card.href)}
+                    onClick={(event) => {
+                      linkClickGuard(event, card.href)
+                      analytics.trackClick(`contact_${card.id}`, `Contact via ${card.label}`)
+                    }}
                     aria-label={`${card.label}: ${card.subtitle}`}
                   >
                     <div className="contact-card-top">
@@ -398,6 +509,22 @@ export default function App() {
                     <small>{contactMeta[card.id] ?? 'Connect here for portfolio-related discussion.'}</small>
                   </a>
                 ))}
+                
+                <div className="contact-card form-card">
+                  <div className="contact-card-top">
+                    <span className="contact-icon">
+                      <ContactIcon id="email" />
+                    </span>
+                    <span className="contact-card-arrow" aria-hidden="true">
+                      {'->'}
+                    </span>
+                  </div>
+                  <strong>Email</strong>
+                  <span>Direct message form</span>
+                  <ContactForm 
+                    onSuccess={() => analytics.trackClick('contact_email_submit', 'Email Form Submitted')} 
+                  />
+                </div>
               </div>
             </div>
 
@@ -410,10 +537,10 @@ export default function App() {
                 </div>
 
                 <nav className="footer-nav" aria-label="Footer navigation">
-                  <a href="#about">About</a>
-                  <a href="#projects">Projects</a>
-                  <a href="#experience">Experience</a>
-                  <a href="#contact">Contact</a>
+                  <a href="#about" onClick={smoothScrollToAnchor}>About</a>
+                  <a href="#projects" onClick={smoothScrollToAnchor}>Projects</a>
+                  <a href="#experience" onClick={smoothScrollToAnchor}>Experience</a>
+                  <a href="#contact" onClick={smoothScrollToAnchor}>Contact</a>
                 </nav>
 
                 <div className="footer-socials">
@@ -466,8 +593,30 @@ export default function App() {
               ×
             </button>
             <p className="eyebrow">Project Display</p>
-            <h3>{activeProject.title}</h3>
+            <div className="modal-header-row">
+              <div>
+                <h3>{activeProject.title}</h3>
+                <span className="modal-date">{activeProject.date}</span>
+              </div>
+              <div className="modal-badges">
+                {activeProject.badges.map((badge) => (
+                  <span key={badge} className={`project-badge badge-${badge.toLowerCase().replace(' ', '-')}`}>
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            </div>
             <p>{activeProject.summary}</p>
+            
+            <div className="project-metrics">
+              {activeProject.metrics.map((metric) => (
+                <div key={metric.label} className="metric-item">
+                  <span className="metric-value">{metric.value}</span>
+                  <span className="metric-label">{metric.label}</span>
+                </div>
+              ))}
+            </div>
+
             <div className="project-detail-blocks">
               <p>
                 <strong>Problem:</strong> {activeProject.problem}
@@ -488,18 +637,31 @@ export default function App() {
               <a
                 href={activeProject.github}
                 className="action-button primary"
-                onClick={(event) => linkClickGuard(event, activeProject.github)}
+                onClick={(event) => {
+                  linkClickGuard(event, activeProject.github)
+                  analytics.trackClick('project_github', `GitHub: ${activeProject.title}`)
+                }}
               >
                 GitHub Link
               </a>
               <a
                 href={activeProject.demo}
                 className="action-button secondary"
-                onClick={(event) => linkClickGuard(event, activeProject.demo)}
+                onClick={(event) => {
+                  linkClickGuard(event, activeProject.demo)
+                  analytics.trackClick('project_demo', `Demo: ${activeProject.title}`)
+                }}
               >
                 Demo Link
               </a>
-              <button type="button" className="action-button secondary" onClick={openCaseStudy}>
+              <button 
+                type="button" 
+                className="action-button secondary" 
+                onClick={() => {
+                  openCaseStudy()
+                  analytics.trackClick('view_case_study_modal', 'Case Study from Modal')
+                }}
+              >
                 View Deep-Dive
               </button>
             </div>

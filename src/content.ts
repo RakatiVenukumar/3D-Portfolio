@@ -7,6 +7,9 @@ export type ProjectItem = {
   technologies: string[]
   github: string
   demo: string
+  date: string
+  metrics: Array<{ label: string; value: string }>
+  badges: Array<'In Production' | 'Open Source' | 'Featured'>
 }
 
 export type ExperienceEntry = {
@@ -40,6 +43,13 @@ export const projects: ProjectItem[] = [
     technologies: ['Python', 'SQL', 'JavaScript', 'Data Visualization'],
     github: 'https://github.com/RakatiVenukumar',
     demo: '#',
+    date: 'Q3 2024',
+    metrics: [
+      { label: 'Investigation Time', value: '-38%' },
+      { label: 'Load Latency', value: '-44%' },
+      { label: 'Accuracy Gain', value: '+24%' },
+    ],
+    badges: ['In Production'],
   },
   {
     title: 'Neural Flow Optimizer',
@@ -54,6 +64,13 @@ export const projects: ProjectItem[] = [
     technologies: ['Python', 'Algorithms', 'Data Structures', 'Git'],
     github: 'https://github.com/RakatiVenukumar',
     demo: '#',
+    date: 'Q2 2024',
+    metrics: [
+      { label: 'Compute Time', value: '-41%' },
+      { label: 'Worst Case', value: '-29%' },
+      { label: 'Memory Usage', value: '-18%' },
+    ],
+    badges: ['Open Source'],
   },
   {
     title: 'Digital Depth Portfolio System',
@@ -68,6 +85,13 @@ export const projects: ProjectItem[] = [
     technologies: ['React', 'Three.js', 'CSS', 'Motion Design'],
     github: 'https://github.com/RakatiVenukumar/3D-Portfolio',
     demo: '#',
+    date: 'Q1 2025',
+    metrics: [
+      { label: 'Session Duration', value: '+153%' },
+      { label: 'CTA Interactions', value: '+270%' },
+      { label: 'Engagement', value: '+45%' },
+    ],
+    badges: ['Featured'],
   },
 ]
 

@@ -25,6 +25,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body,
 #root {
@@ -361,6 +365,19 @@ a {
 .project-card {
   cursor: pointer;
   animation: projectRise 680ms ease both;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+}
+
+.project-card:hover {
+  transform: translateY(-8px) translateZ(0);
+}
+
+@supports (animation: parallax) {
+  .project-card {
+    animation: projectRise 680ms ease both, parallaxShift 0.6s ease-out;
+  }
 }
 
 .project-card:hover,
@@ -898,6 +915,294 @@ a {
   50% {
     opacity: 0;
   }
+}
+
+@keyframes spinnerRing {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-spinner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(16, 77, 151, 0.18), transparent 34%),
+    linear-gradient(180deg, #020412 0%, #040b1a 42%, #061a40 100%);
+  animation: fadeInUp 400ms ease both;
+}
+
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.loading-spinner-ring {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(0, 212, 255, 0.2);
+  border-radius: 50%;
+  animation: spinnerRing 1.5s ease-in-out infinite;
+}
+
+.loading-spinner-ring:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.loading-spinner-ring:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.spinner-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #00d4ff, #38bdf8);
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.6);
+}
+
+.spinner-text {
+  position: absolute;
+  bottom: -60px;
+  font-size: 0.9rem;
+  color: rgba(200, 232, 255, 0.8);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(163, 227, 255, 0.88);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-input,
+.form-textarea {
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(6, 18, 40, 0.4);
+  color: #e6f1ff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 240ms ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: rgba(0, 212, 255, 0.5);
+  background: rgba(6, 18, 40, 0.6);
+  box-shadow:
+    0 0 0 2px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: rgba(196, 232, 255, 0.5);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 0.85rem;
+}
+
+.form-submit {
+  padding: 12px 18px;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(56, 189, 248, 0.06));
+  color: #00d4ff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 240ms ease;
+}
+
+.form-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.18), rgba(56, 189, 248, 0.12));
+  border-color: rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.form-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.form-success-feedback {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #86efac;
+  font-size: 0.85rem;
+  text-align: center;
+  animation: fadeInUp 400ms ease both;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column !important;
+}
+
+.project-card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.project-date {
+  font-size: 0.75rem;
+  color: rgba(182, 228, 255, 0.64);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.project-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.badge-in-production {
+  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.12);
+  color: #86efac;
+}
+
+.badge-open-source {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.12);
+  color: #c7d2fe;
+}
+
+.badge-featured {
+  border-color: rgba(168, 85, 247, 0.4);
+  background: rgba(168, 85, 247, 0.12);
+  color: #e9d5ff;
+}
+
+.modal-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modal-date {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(182, 228, 255, 0.64);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+.modal-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.project-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(0, 212, 255, 0.06);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #00d4ff;
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: rgba(200, 232, 255, 0.72);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
 }
 
 @media (max-width: 980px) {
