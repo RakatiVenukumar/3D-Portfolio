@@ -85,6 +85,7 @@ function smoothScrollToAnchor(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault()
     const target = document.querySelector<HTMLElement>(href)
     if (target) {
+      // ScrollControls uses a nested scroll container, so we must target the real scroll parent.
       const getScrollableParent = (element: HTMLElement): HTMLElement | null => {
         let parent = element.parentElement
 
@@ -203,12 +204,14 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    // Keep the intro visible long enough for the full cinematic loader to complete.
     // Hide loading spinner after scene loads
     const timer = setTimeout(() => setShowLoadingSpinner(false), 5000)
     return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
+    // Prevent the homepage from animating in until the loader is finished.
     document.body.classList.toggle('site-loading', showLoadingSpinner)
     return () => {
       document.body.classList.remove('site-loading')
@@ -265,6 +268,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    // Each major section and card gets a bottom-up reveal as it enters the viewport.
     if (revealObserverRef.current) {
       revealObserverRef.current.disconnect()
     }
@@ -290,6 +294,7 @@ export default function App() {
       ),
     )
 
+    // Attach the observer after the targets are tagged with reveal classes.
     revealTargets.forEach((element, index) => {
       element.classList.add('reveal-on-scroll')
       element.style.setProperty('--reveal-delay', `${(index % 6) * 70}ms`)

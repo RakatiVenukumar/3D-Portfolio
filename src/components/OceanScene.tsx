@@ -27,6 +27,7 @@ type CameraKeyframe = {
 }
 
 const cameraKeyframes: CameraKeyframe[] = [
+  // The camera path keeps the scene readable while still moving through the depth story.
   {
     t: 0,
     position: new THREE.Vector3(0, 4.5, 13),
@@ -97,6 +98,7 @@ function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
   const lookTarget = useRef(new THREE.Vector3(0, 0, 0))
 
   useFrame((state, delta) => {
+    // Blend the scroll position into the camera so the scene stays smooth instead of snapping.
     const sample = sampleCameraPath(scroll.offset)
     const easing = reducedMotion ? 1 : 1 - Math.exp(-delta * 2.4)
 
@@ -435,6 +437,7 @@ function SceneContent({
 }) {
   return (
     <>
+      {/* Layer the atmosphere from background to foreground so the beach/ocean scene feels deep. */}
       <CameraRig reducedMotion={reducedMotion} />
 
       <ambientLight intensity={0.72} color="#94d8ff" />
@@ -495,6 +498,7 @@ export function OceanScene({ children, reducedMotion }: OceanSceneProps) {
   const [sceneReady, setSceneReady] = useState(false)
 
   useEffect(() => {
+    // Lock page scrolling to the WebGL experience unless we fall back to the simplified mode.
     document.body.style.overflow = useFallback ? 'auto' : 'hidden'
     return () => {
       document.body.style.overflow = ''

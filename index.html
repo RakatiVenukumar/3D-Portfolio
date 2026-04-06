@@ -15,16 +15,30 @@
       property="og:description"
       content="Cinematic software portfolio featuring 3D storytelling, project outcomes, and deep-dive engineering case studies."
     />
-    <meta property="og:url" content="https://rakativenukumar.github.io/3D-Portfolio/" />
-    <meta property="og:image" content="https://rakativenukumar.github.io/3D-Portfolio/og-cover.svg" />
+    <meta property="og:url" content="https://3d-portfolio.vercel.app/" />
+    <meta property="og:image" content="https://3d-portfolio.vercel.app/og-cover.svg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Rakati Venu Kumar | Digital Ocean Portfolio" />
     <meta
       name="twitter:description"
       content="Cinematic software portfolio featuring 3D storytelling, project outcomes, and deep-dive engineering case studies."
     />
-    <meta name="twitter:image" content="https://rakativenukumar.github.io/3D-Portfolio/og-cover.svg" />
-    <link rel="canonical" href="https://rakativenukumar.github.io/3D-Portfolio/" />
+    <meta name="twitter:image" content="https://3d-portfolio.vercel.app/og-cover.svg" />
+    <link rel="canonical" href="https://3d-portfolio.vercel.app/" />
+    <script>
+      (() => {
+        const origin = window.location.origin;
+        const canonical = document.querySelector('link[rel="canonical"]');
+        const ogUrl = document.querySelector('meta[property="og:url"]');
+        const ogImage = document.querySelector('meta[property="og:image"]');
+        const twitterImage = document.querySelector('meta[name="twitter:image"]');
+
+        if (canonical) canonical.setAttribute('href', `${origin}/`);
+        if (ogUrl) ogUrl.setAttribute('content', `${origin}/`);
+        if (ogImage) ogImage.setAttribute('content', `${origin}/og-cover.svg`);
+        if (twitterImage) twitterImage.setAttribute('content', `${origin}/og-cover.svg`);
+      })();
+    </script>
     <title>Rakati Venu Kumar | Digital Ocean Portfolio</title>
   </head>
   <body>

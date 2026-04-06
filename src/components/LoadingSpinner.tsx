@@ -5,6 +5,7 @@ export function LoadingSpinner() {
   const letters = 'LOADING'.split('')
   const stars = useMemo(
     () =>
+      // Deterministic noise keeps the starfield rich without random re-renders.
       Array.from({ length: 96 }, (_, index) => {
         const noiseA = Math.abs(Math.sin((index + 1) * 12.9898) * 43758.5453) % 1
         const noiseB = Math.abs(Math.sin((index + 1) * 78.233) * 12345.6789) % 1
@@ -26,6 +27,7 @@ export function LoadingSpinner() {
     <div className="loading-spinner-overlay" aria-label="Loading portfolio" role="progressbar" aria-valuetext="Loading">
       <div className="loading-spinner-container">
         <div className="loading-cinematic" aria-hidden="true">
+          {/* The loader layers the sky, beach, water, and lighthouse so the scene reads like a single shot. */}
           <div className="loading-stars">
             {stars.map((star, index) => (
               <span
@@ -56,6 +58,7 @@ export function LoadingSpinner() {
             </div>
           </div>
 
+          {/* These stage labels briefly match the beam sweep so the load sequence feels intentional. */}
           <p className="loading-stage stage-sand">SAND</p>
           <p className="loading-stage stage-loading">LOADING</p>
           <p className="loading-stage stage-water">WATER</p>
