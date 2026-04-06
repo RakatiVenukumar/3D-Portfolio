@@ -1903,8 +1903,21 @@ body.site-loading .hero-reveal {
     grid-template-columns: 1fr;
   }
 
+  .footer-socials {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-socials a {
+    width: 100%;
+  }
+
   .skill-network {
     min-height: 620px;
+  }
+
+  .project-card,
+  .contact-card {
+    min-height: 220px;
   }
 }
 
@@ -1952,6 +1965,17 @@ body.site-loading .hero-reveal {
     font-size: 0.76rem;
   }
 
+  .hero-copy,
+  .hero-now-card,
+  .about-copy,
+  .section-copy,
+  .contact-panel,
+  .resume-panel,
+  .terminal-panel,
+  .panel-skill-network {
+    width: 100%;
+  }
+
   .panel-wide,
   .terminal-panel,
   .resume-panel,
@@ -1968,6 +1992,29 @@ body.site-loading .hero-reveal {
     padding: 12px 14px;
   }
 
+  .project-grid,
+  .contact-grid,
+  .case-study-grid {
+    gap: 14px;
+  }
+
+  .contact-title-row h2 {
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+
+  .contact-status {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .footer-socials {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-socials a {
+    width: 100%;
+  }
+
   .skill-network {
     display: none;
   }
@@ -1980,6 +2027,41 @@ body.site-loading .hero-reveal {
     top: auto;
     right: 18px;
     bottom: 18px;
+  }
+
+  .project-modal-backdrop {
+    padding: 14px;
+  }
+
+  .project-modal {
+    max-height: calc(100vh - 28px);
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .modal-close {
+    top: 14px;
+    right: 14px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .loading-beam {
+    width: 320px;
+  }
+
+  .loading-lighthouse {
+    left: 14%;
+    transform: scale(0.84);
+    transform-origin: bottom left;
+  }
+
+  .stage-sand {
+    left: 10%;
+  }
+
+  .stage-water {
+    right: 10%;
   }
 }
 
