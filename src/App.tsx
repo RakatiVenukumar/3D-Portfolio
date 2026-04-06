@@ -393,7 +393,7 @@ export default function App() {
   }
 
   const currentYear = new Date().getFullYear()
-  const resumeFile = '/VenuResume.pdf'
+  const resumeFile = '/VenuKumarResume.pdf'
 
   if (showCaseStudy) {
     return <CaseStudyPage onBack={closeCaseStudy} />
