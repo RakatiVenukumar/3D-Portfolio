@@ -14,8 +14,8 @@ export type ProjectItem = {
 
 export type ExperienceEntry = {
   line: string
-  href: string
-  label: string
+  href?: string
+  label?: string
 }
 
 export const skills = [
@@ -27,69 +27,72 @@ export const skills = [
   'HTML',
   'CSS',
   'JavaScript',
+  'React',
+  'Django',
+  'RestAPI',
 ] as const
 
 export const projects: ProjectItem[] = [
   {
-    title: 'Aqua Intelligence Console',
+    title: 'PRD Golf Charity Subscription Platform',
     summary:
-      'An analytics workspace that treats streaming telemetry like a living ocean, combining Python automation, responsive dashboards, and real-time system awareness.',
+      'A subscription platform for golf charity with separate user and admin experiences, designed to support memberships, access control, and streamlined management.',
     problem:
-      'Operational teams had fragmented telemetry across multiple views, creating delayed diagnosis and slower decision cycles during incidents.',
+      'The platform needed clear separation between user flows and admin operations so both audiences could complete their tasks efficiently in one product.',
     built:
-      'I built a Python ingestion pipeline with SQL-backed aggregation, plus a responsive React dashboard for unified signal monitoring and alert context.',
+      'I worked on both the admin and user parts of the application, shaping the role-based flows, subscription experience, and content structure in a Next.js codebase.',
     result:
-      'Reduced investigation time by 38%, cut dashboard load latency from 2.1s to 1.2s, and improved alert triage accuracy by 24% in internal testing.',
-    technologies: ['Python', 'SQL', 'JavaScript', 'Data Visualization'],
-    github: 'https://github.com/RakatiVenukumar',
+      'Delivered a dual-portal subscription experience that supports end users and admin management from a single maintainable application.',
+    technologies: ['Next.js', 'TypeScript', 'Supabase', 'PostgreSQL'],
+    github: 'https://github.com/RakatiVenukumar/-PRD-Golf-Charity-Subscription-Platform',
     demo: '#',
-    date: 'Q3 2024',
+    date: '2026',
     metrics: [
-      { label: 'Investigation Time', value: '-38%' },
-      { label: 'Load Latency', value: '-44%' },
-      { label: 'Accuracy Gain', value: '+24%' },
+      { label: 'Portals', value: 'Admin + User' },
+      { label: 'Stack', value: 'Next.js' },
+      { label: 'Data', value: 'Supabase' },
     ],
-    badges: ['In Production'],
+    badges: ['Featured'],
   },
   {
-    title: 'Neural Flow Optimizer',
+    title: 'AI CRM HCP',
     summary:
-      'A problem-solving engine focused on algorithmic efficiency, visualizing graph traversal and optimization paths as connected streams of light.',
+      'An AI-first CRM interaction module that turns raw HCP notes into structured records, summaries, and follow-up actions through a conversational workflow.',
     problem:
-      'Route and allocation calculations became expensive at scale, leading to inconsistent performance and unpredictable response times.',
+      'Field interaction notes were hard to convert into structured CRM data quickly, making follow-up tracking and review slower than it should be.',
     built:
-      'I implemented optimized graph traversal routines, memoized hot-path calculations, and benchmark tooling to compare algorithm variants.',
+      'I built the agent workflow, persistence layer, and editable frontend so the app can extract interaction details, preserve conversation context, and save useful CRM outputs.',
     result:
-      'Lowered median computation time by 41%, improved worst-case path resolution by 29%, and eliminated repeated recomputation in key workflows.',
-    technologies: ['Python', 'Algorithms', 'Data Structures', 'Git'],
-    github: 'https://github.com/RakatiVenukumar',
+      'Created a personal AI automation project with multi-turn context, auto-fill extraction, manual overrides, and next-step recommendations.',
+    technologies: ['Python', 'FastAPI', 'React', 'Redux', 'LangGraph', 'SQLite'],
+    github: 'https://github.com/RakatiVenukumar/Ai-crm-hcp',
     demo: '#',
-    date: 'Q2 2024',
+    date: '2026',
     metrics: [
-      { label: 'Compute Time', value: '-41%' },
-      { label: 'Worst Case', value: '-29%' },
-      { label: 'Memory Usage', value: '-18%' },
+      { label: 'Agent Tools', value: '5' },
+      { label: 'Context', value: 'Multi-turn' },
+      { label: 'Workflow', value: 'AI-assisted' },
     ],
     badges: ['Open Source'],
   },
   {
-    title: 'Digital Depth Portfolio System',
+    title: 'Navodaya High School Website',
     summary:
-      'A cinematic personal experience that merges storytelling, WebGL environments, and interaction design to communicate technical identity with precision.',
+      'A responsive school website prototype focused on frontend technologies, built to present school information, admissions, and contact details clearly across devices.',
     problem:
-      'Traditional portfolio layouts failed to communicate engineering depth, system thinking, and implementation tradeoffs in a memorable way.',
+      'The school needed a modern frontend presence that felt polished, mobile-friendly, and easy to maintain for future content updates.',
     built:
-      'I designed and implemented a scroll-driven React + Three.js experience with structured content architecture, reusable UI primitives, and performance-aware rendering.',
+      'I built the React and Vite frontend with modular sections, smooth navigation, responsive layouts, and centralized content for easy updates.',
     result:
-      'Increased average session duration from 54s to 2m 18s in test traffic and raised portfolio CTA interactions by 2.7x versus a static baseline.',
-    technologies: ['React', 'Three.js', 'CSS', 'Motion Design'],
-    github: 'https://github.com/RakatiVenukumar/3D-Portfolio',
-    demo: '#',
-    date: 'Q1 2025',
+      'Delivered a clean frontend-focused school website with accessible structure, responsive interactions, and a production-ready static build.',
+    technologies: ['React', 'Vite', 'JavaScript', 'CSS'],
+    github: 'https://github.com/Girish2513/School-Prototype',
+    demo: 'https://school-prototype-six.vercel.app/',
+    date: '2025',
     metrics: [
-      { label: 'Session Duration', value: '+153%' },
-      { label: 'CTA Interactions', value: '+270%' },
-      { label: 'Engagement', value: '+45%' },
+      { label: 'Layout', value: 'Responsive' },
+      { label: 'Content', value: 'Modular' },
+      { label: 'UX', value: 'Accessible' },
     ],
     badges: ['Featured'],
   },
@@ -98,11 +101,9 @@ export const projects: ProjectItem[] = [
 export const experienceEntries: ExperienceEntry[] = [
   {
     line: 'boot.education("Computer Science Foundations")',
-    href: 'https://www.coursera.org/',
-    label: 'View course progress',
   },
   {
-    line: 'load.learning("Python", "Data Structures", "Algorithms")',
+    line: 'load.learning("Python", "React", "Django", "RestAPI")',
     href: 'https://github.com/RakatiVenukumar?tab=repositories',
     label: 'See learning repositories',
   },
@@ -118,8 +119,8 @@ export const experienceEntries: ExperienceEntry[] = [
   },
   {
     line: 'status => building depth through consistent exploration',
-    href: '#contact',
-    label: 'Start a conversation',
+    href: 'mailto:venurakati@gmail.com',
+    label: 'Start a conversation by email',
   },
 ]
 
@@ -128,19 +129,37 @@ export const contactCards = [
     id: 'github',
     label: 'GitHub',
     subtitle: 'Code repositories and experiments',
-    href: '#',
+    href: 'https://github.com/RakatiVenukumar',
   },
   {
     id: 'linkedin',
     label: 'LinkedIn',
     subtitle: 'Professional profile and network',
-    href: '#',
+    href: 'https://www.linkedin.com/in/rakati-venu-kumar-0748bb302/',
+  },
+  {
+    id: 'leetcode',
+    label: 'LeetCode',
+    subtitle: 'Problem solving and DSA practice',
+    href: 'https://leetcode.com/u/VenuKumar_23/',
+  },
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    subtitle: 'Community and personal updates',
+    href: 'https://www.instagram.com/venukumar_23/',
+  },
+  {
+    id: 'phone',
+    label: 'Phone',
+    subtitle: '+91 9381559795',
+    href: 'tel:+919381559795',
   },
   {
     id: 'email',
     label: 'Email',
     subtitle: 'Direct conversation channel',
-    href: '#',
+    href: 'mailto:venurakati@gmail.com',
   },
 ] as const
 
@@ -153,6 +172,9 @@ export const skillNodePositions = [
   { x: 50, y: 62 },
   { x: 72, y: 58 },
   { x: 86, y: 76 },
+  { x: 68, y: 8 },
+  { x: 14, y: 78 },
+  { x: 42, y: 88 },
 ]
 
 export const skillLinks = [
@@ -165,4 +187,11 @@ export const skillLinks = [
   [5, 6],
   [6, 7],
   [3, 6],
+  [7, 8],
+  [5, 8],
+  [6, 8],
+  [0, 9],
+  [4, 9],
+  [9, 10],
+  [7, 10],
 ] as const

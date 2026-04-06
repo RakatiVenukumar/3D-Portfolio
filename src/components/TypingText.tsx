@@ -2,17 +2,23 @@ import { useEffect, useMemo, useState } from 'react'
 
 type TypingLine = {
   line: string
-  href: string
-  label: string
+  href?: string
+  label?: string
 }
 
 type TypingTextProps = {
   lines: TypingLine[]
   speed?: number
   reducedMotion?: boolean
+  onAnchorClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
-export function TypingText({ lines, speed = 26, reducedMotion = false }: TypingTextProps) {
+export function TypingText({
+  lines,
+  speed = 26,
+  reducedMotion = false,
+  onAnchorClick,
+}: TypingTextProps) {
   const fullText = useMemo(() => lines.map((entry) => entry.line).join('\n'), [lines])
   const [visibleChars, setVisibleChars] = useState(0)
 
@@ -50,11 +56,19 @@ export function TypingText({ lines, speed = 26, reducedMotion = false }: TypingT
       </pre>
 
       <div className={`terminal-links ${isDone ? 'is-visible' : ''}`}>
-        {lines.map((entry) => (
-          <a key={entry.line} href={entry.href} className="terminal-link" aria-label={entry.label}>
-            {entry.label}
-          </a>
-        ))}
+        {lines
+          .filter((entry) => entry.href && entry.label)
+          .map((entry) => (
+            <a
+              key={entry.line}
+              href={entry.href}
+              className="terminal-link"
+              aria-label={entry.label}
+              onClick={entry.href?.startsWith('#') ? onAnchorClick : undefined}
+            >
+              {entry.label}
+            </a>
+          ))}
       </div>
     </div>
   )

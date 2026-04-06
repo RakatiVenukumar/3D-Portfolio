@@ -28,6 +28,23 @@ function ContactIcon({ id }: { id: string }) {
         <path d="M5.34 8.5H2.72V21h2.62V8.5Zm.16-3.86A1.53 1.53 0 1 0 5.48 7.7a1.53 1.53 0 0 0 .02-3.06ZM21 13.2c0-3.08-1.64-4.51-3.84-4.51a3.34 3.34 0 0 0-3 1.65V8.5h-2.62V21h2.62v-6.55c0-1.73.94-2.88 2.37-2.88 1.4 0 1.86.96 1.86 2.84V21H21v-7.8Z" />
       </svg>
     ),
+    leetcode: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M14.09 3.36a1 1 0 0 1 1.42 0l4.13 4.13a1 1 0 1 1-1.42 1.42l-4.13-4.13a1 1 0 0 1 0-1.42Z" />
+        <path d="M10.21 7.23a1 1 0 0 1 1.41 0 1 1 0 0 1 0 1.42l-4.7 4.7 4.7 4.7a1 1 0 1 1-1.41 1.41l-5.41-5.4a1 1 0 0 1 0-1.42l5.41-5.41Z" />
+        <path d="M9.35 13.35a1 1 0 0 1 1-1h8.83a1 1 0 0 1 0 2h-8.83a1 1 0 0 1-1-1Z" />
+      </svg>
+    ),
+    instagram: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 3.5h10A3.5 3.5 0 0 1 20.5 7v10a3.5 3.5 0 0 1-3.5 3.5H7A3.5 3.5 0 0 1 3.5 17V7A3.5 3.5 0 0 1 7 3.5Zm0 2A1.5 1.5 0 0 0 5.5 7v10A1.5 1.5 0 0 0 7 18.5h10a1.5 1.5 0 0 0 1.5-1.5V7A1.5 1.5 0 0 0 17 5.5H7Zm10.25 1.1a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3ZM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+      </svg>
+    ),
+    phone: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6.62 2.8a1.5 1.5 0 0 1 1.54.36l2.06 2.06a1.5 1.5 0 0 1 .35 1.59l-.7 2.1a1.5 1.5 0 0 0 .36 1.53l2.33 2.33a1.5 1.5 0 0 0 1.53.36l2.1-.7a1.5 1.5 0 0 1 1.59.35l2.06 2.06a1.5 1.5 0 0 1 .36 1.54 5.7 5.7 0 0 1-5.47 3.94A12.72 12.72 0 0 1 4.74 9.73 5.7 5.7 0 0 1 8.68 4.26l-2.06-2.06Z" />
+      </svg>
+    ),
     email: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 6.75A2.75 2.75 0 0 1 5.75 4h12.5A2.75 2.75 0 0 1 21 6.75v10.5A2.75 2.75 0 0 1 18.25 20H5.75A2.75 2.75 0 0 1 3 17.25V6.75Zm2.09-.25L12 11.57l6.91-5.07H5.09Zm13.41 1.56-5.76 4.22a1.25 1.25 0 0 1-1.48 0L5.5 8.06v9.19c0 .14.11.25.25.25h12.5c.14 0 .25-.11.25-.25V8.06Z" />
@@ -66,13 +83,36 @@ function smoothScrollToAnchor(event: React.MouseEvent<HTMLAnchorElement>) {
   const href = event.currentTarget.getAttribute('href')
   if (href?.startsWith('#')) {
     event.preventDefault()
-    const target = document.querySelector(href)
+    const target = document.querySelector<HTMLElement>(href)
     if (target) {
-      const offsetTop = target.getBoundingClientRect().top + window.scrollY - 80
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth',
-      })
+      const getScrollableParent = (element: HTMLElement): HTMLElement | null => {
+        let parent = element.parentElement
+
+        while (parent) {
+          const style = window.getComputedStyle(parent)
+          const canScrollY = /(auto|scroll)/.test(style.overflowY)
+
+          if (canScrollY && parent.scrollHeight > parent.clientHeight) {
+            return parent
+          }
+
+          parent = parent.parentElement
+        }
+
+        return (document.scrollingElement as HTMLElement | null) ?? null
+      }
+
+      const scrollParent = getScrollableParent(target)
+      if (scrollParent) {
+        const parentRect = scrollParent.getBoundingClientRect()
+        const targetRect = target.getBoundingClientRect()
+        const top = targetRect.top - parentRect.top + scrollParent.scrollTop
+
+        scrollParent.scrollTo({
+          top,
+          behavior: 'smooth',
+        })
+      }
     }
   }
 }
@@ -137,6 +177,7 @@ export default function App() {
   const [showLoadingSpinner, setShowLoadingSpinner] = useState(true)
   const modalRef = useRef<HTMLDivElement>(null)
   const sectionObserverRef = useRef<IntersectionObserver | null>(null)
+  const revealObserverRef = useRef<IntersectionObserver | null>(null)
 
   const openCaseStudy = () => {
     const nextUrl = new URL(window.location.href)
@@ -163,9 +204,16 @@ export default function App() {
 
   useEffect(() => {
     // Hide loading spinner after scene loads
-    const timer = setTimeout(() => setShowLoadingSpinner(false), 2400)
+    const timer = setTimeout(() => setShowLoadingSpinner(false), 5000)
     return () => clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    document.body.classList.toggle('site-loading', showLoadingSpinner)
+    return () => {
+      document.body.classList.remove('site-loading')
+    }
+  }, [showLoadingSpinner])
 
   useEffect(() => {
     // Track page view
@@ -217,6 +265,60 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (revealObserverRef.current) {
+      revealObserverRef.current.disconnect()
+    }
+
+    const revealTargets = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        [
+          '.about-section .section-inner > *',
+          '.skills-section .section-inner > *',
+          '.skills-section .skill-network > *',
+          '.projects-section .section-inner > *',
+          '.projects-section .project-card',
+          '.experience-section .section-inner > *',
+          '.experience-section .terminal-link',
+          '.resume-section .section-inner > *',
+          '.contact-section .section-inner > *',
+          '.contact-section .contact-card',
+          '.site-footer .site-footer-main > *',
+          '.site-footer .footer-nav a',
+          '.site-footer .footer-socials a',
+          '.site-footer .footer-copy',
+        ].join(', '),
+      ),
+    )
+
+    revealTargets.forEach((element, index) => {
+      element.classList.add('reveal-on-scroll')
+      element.style.setProperty('--reveal-delay', `${(index % 6) * 70}ms`)
+    })
+
+    revealObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const element = entry.target as HTMLElement
+
+          if (entry.isIntersecting) {
+            element.classList.add('is-revealed')
+          } else {
+            element.classList.remove('is-revealed')
+          }
+        })
+      },
+      {
+        threshold: 0.15,
+        rootMargin: '0px 0px -8% 0px',
+      },
+    )
+
+    revealTargets.forEach((element) => revealObserverRef.current?.observe(element))
+
+    return () => revealObserverRef.current?.disconnect()
+  }, [showCaseStudy, showLoadingSpinner])
+
+  useEffect(() => {
     const syncCaseStudyState = () => {
       const params = new URLSearchParams(window.location.search)
       setShowCaseStudy(params.get('case-study') === 'digital-depth')
@@ -226,6 +328,14 @@ export default function App() {
     window.addEventListener('popstate', syncCaseStudyState)
     return () => window.removeEventListener('popstate', syncCaseStudyState)
   }, [])
+
+  useEffect(() => {
+    document.body.classList.toggle('case-study-open', showCaseStudy)
+
+    return () => {
+      document.body.classList.remove('case-study-open')
+    }
+  }, [showCaseStudy])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -271,9 +381,14 @@ export default function App() {
   const contactMeta: Record<string, string> = {
     github: 'Best for code reviews, collaboration, and project history.',
     linkedin: 'Best for role opportunities and professional conversations.',
+    leetcode: 'Best for algorithm practice history and coding consistency.',
+    instagram: 'Best for personal updates and lightweight networking.',
+    phone: 'Best for urgent calls and direct hiring conversations.',
     email: 'Best for direct inquiries, interviews, and quick follow-ups.',
   }
+
   const currentYear = new Date().getFullYear()
+  const resumeFile = '/VenuResume.pdf'
 
   if (showCaseStudy) {
     return <CaseStudyPage onBack={closeCaseStudy} />
@@ -285,76 +400,115 @@ export default function App() {
       <OceanScene reducedMotion={reducedMotion}>
         <div className="page-shell">
           <Section id="hero" ariaLabel="Hero section" className="hero-section">
-            <div className="hero-copy">
-              <p className="eyebrow">Digital Ocean Portfolio</p>
-              <div className="hero-title-wrap">
-                <h1 className="hero-name">Rakati Venu Kumar</h1>
-                <div className="hero-reflection" aria-hidden="true">
-                  Rakati Venu Kumar
+            <div className="hero-layout">
+              <div className="hero-copy">
+                <p className="eyebrow hero-reveal" style={{ '--d': '0.02s' } as CSSProperties}>Personal Portfolio</p>
+                <div className="hero-title-wrap">
+                  <h1 className="hero-name hero-reveal" style={{ '--d': '0.12s' } as CSSProperties}>Rakati Venu Kumar</h1>
+                  <div className="hero-reflection" aria-hidden="true">
+                    Rakati Venu Kumar
+                  </div>
                 </div>
-              </div>
-              <p className="hero-role">Python Developer | Software Engineer</p>
-              <p className="hero-tagline">Exploring depth through code.</p>
-              <div className="hero-meta">
-                <span>Calm surface</span>
-                <span>Scroll to descend</span>
-              </div>
-              <div className="hero-actions">
-                <a 
-                  href="#resume" 
-                  className="action-button primary"
-                  onClick={(e) => {
-                    smoothScrollToAnchor(e)
-                    analytics.trackClick('view_resume', 'View Resume')
-                  }}
+                <p className="hero-role hero-reveal" style={{ '--d': '0.24s' } as CSSProperties}>Python Developer | Software Engineer</p>
+                <p className="hero-tagline hero-reveal" style={{ '--d': '0.34s' } as CSSProperties}>Building reliable full-stack products with Python at the core.</p>
+                <div className="hero-actions hero-reveal" style={{ '--d': '0.46s' } as CSSProperties}>
+                  <a 
+                    href={resumeFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="action-button primary"
+                    onClick={() => {
+                      analytics.trackClick('view_resume', 'View Resume')
+                    }}
+                  >
+                    View Resume
+                  </a>
+                  <a
+                    href="#footer"
+                    className="action-button accent"
+                    onClick={(event) => {
+                      smoothScrollToAnchor(event)
+                      analytics.trackClick('lets_connect', "Let's Connect")
+                    }}
+                  >
+                    Let&apos;s Connect
+                  </a>
+                  <button 
+                    type="button" 
+                    className="action-button ghost" 
+                    onClick={() => {
+                      openCaseStudy()
+                      analytics.trackClick('case_study', 'Case Study')
+                    }}
+                  >
+                    Case Study
+                  </button>
+                </div>
+
+                <div className="hero-profile-badge hero-reveal" style={{ '--d': '0.58s' } as CSSProperties}>
+                  <img src="/Profile3.jpeg" alt="Rakati Venu Kumar" loading="lazy" />
+                  <div>
+                    <strong>Rakati Venu Kumar</strong>
+                    <span>Full-Stack Python Developer</span>
+                  </div>
+                </div>
+
+                <a
+                  href="#about"
+                  className="hero-scroll-cue hero-reveal"
+                  style={{ '--d': '0.7s' } as CSSProperties}
+                  onClick={smoothScrollToAnchor}
                 >
-                  View Resume
+                  <span className="hero-scroll-arrow" aria-hidden="true">↓</span>
+                  <span>Scroll to explore projects and skills</span>
                 </a>
-                <a 
-                  href="#contact" 
-                  className="action-button secondary"
-                  onClick={(e) => {
-                    smoothScrollToAnchor(e)
-                    analytics.trackClick('contact_me', 'Contact Me')
-                  }}
-                >
-                  Contact Me
-                </a>
-                <button 
-                  type="button" 
-                  className="action-button secondary" 
-                  onClick={() => {
-                    openCaseStudy()
-                    analytics.trackClick('case_study', 'Case Study')
-                  }}
-                >
-                  Case Study
-                </button>
               </div>
+
+              <aside className="hero-now-card hero-reveal" style={{ '--d': '0.54s' } as CSSProperties}>
+                <p className="eyebrow">Currently Working On</p>
+                <h3>AI Job Application Automation Agent</h3>
+                <p>
+                  Building an AI automation agent that applies to jobs based on user preferences such as role,
+                  salary expectations, and experience level across portals like LinkedIn, Naukri, Unstop, and
+                  Indeed.
+                </p>
+                <div className="hero-now-meta">
+                  <span>Python AI</span>
+                  <span>Automation</span>
+                  <span>Multi-Portal</span>
+                </div>
+              </aside>
             </div>
           </Section>
 
           <Section id="about" ariaLabel="About section" className="about-section">
-            <div className="glass-panel panel-wide">
-              <p className="eyebrow">About</p>
-              <h2>Developer thinking translated into an ocean of systems, structure, and curiosity.</h2>
-              <p>
-                I build software with a bias for clarity, reliability, and technical depth. This space is
-                designed like a mind map underwater: calm on the surface, increasingly structured as you move
-                deeper into the architecture of ideas.
-              </p>
-              <p>
-                My focus sits at the intersection of Python engineering, algorithmic problem solving, and
-                practical frontend systems that communicate complexity without noise.
-              </p>
+            <div className="glass-panel panel-wide about-panel">
+              <div className="about-layout">
+                <div className="about-copy">
+                  <p className="eyebrow about-eyebrow">About</p>
+                  <h2>Fresher seeking opportunities in full-stack Python and React development.</h2>
+                  <p>
+                    I am a fresher focused on clarity, reliability, and technical depth. My interest is in
+                    practical systems that are clean, scalable, and easy to understand.
+                  </p>
+                  <p>
+                    My interest sits at the intersection of Python engineering, algorithmic problem solving, and
+                    frontend systems that communicate complexity without noise.
+                  </p>
+                </div>
+
+                <figure className="about-photo-frame" aria-label="Profile photo">
+                  <img src="/Profile3.jpeg" alt="Portrait of Rakati Venu Kumar" loading="lazy" />
+                </figure>
+              </div>
             </div>
           </Section>
 
           <Section id="skills" ariaLabel="Skills section" className="skills-section">
             <div className="glass-panel panel-skill-network">
               <div className="panel-header">
-                <p className="eyebrow">Skills</p>
-                <h2>Connected knowledge spheres in a neural-style map.</h2>
+                <p className="eyebrow skills-eyebrow">Skills</p>
+                <h2>A constellation of connected expertise</h2>
               </div>
 
               <div className="skill-network">
@@ -400,10 +554,10 @@ export default function App() {
             <div className="section-split">
               <div className="section-copy glass-panel compact-panel">
                 <p className="eyebrow">Projects</p>
-                <h2>Vault platforms emerging from the ocean floor.</h2>
+                <h2>Projects built by a fresher with strong Python full-stack skills.</h2>
                 <p>
-                  Each project is presented like a stored knowledge object. Select a platform to expand its
-                  holographic detail card.
+                  Each project highlights practical work across Python backends, databases, and modern web
+                  interfaces. Select any one to open its interactive detail card.
                 </p>
               </div>
 
@@ -447,23 +601,38 @@ export default function App() {
               </div>
               <p className="eyebrow">Experience</p>
               <h2>Learning journey rendered as a submerged terminal.</h2>
-              <TypingText lines={experienceEntries} reducedMotion={reducedMotion} />
+              <TypingText
+                lines={experienceEntries}
+                reducedMotion={reducedMotion}
+                onAnchorClick={smoothScrollToAnchor}
+              />
             </div>
           </Section>
 
           <Section id="resume" ariaLabel="Resume section" className="resume-section">
             <div className="glass-panel resume-panel">
               <p className="eyebrow">Resume</p>
-              <h2>A glowing archive container with multiple access paths.</h2>
+              <h2>Resume access for recruiters and hiring teams.</h2>
               <p>
-                Connect your final resume destination here. The interface is already prepared for both view and
-                download actions.
+                Open the latest version instantly or download a copy for review. Both options point to the same
+                up-to-date resume file.
               </p>
               <div className="resume-actions">
-                <a href="#" onClick={(event) => linkClickGuard(event, '#')} className="action-button primary">
+                <a
+                  href={resumeFile}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="action-button primary"
+                  onClick={() => analytics.trackClick('resume_view_section', 'View Resume (Section)')}
+                >
                   View Resume
                 </a>
-                <a href="#" onClick={(event) => linkClickGuard(event, '#')} className="action-button secondary">
+                <a
+                  href={resumeFile}
+                  download="Rakati_Venu_Kumar_Resume.pdf"
+                  className="action-button secondary"
+                  onClick={() => analytics.trackClick('resume_download', 'Download Resume')}
+                >
                   Download Resume
                 </a>
               </div>
@@ -528,7 +697,7 @@ export default function App() {
               </div>
             </div>
 
-            <footer className="site-footer glass-panel" aria-label="Portfolio footer">
+            <footer id="footer" className="site-footer glass-panel" aria-label="Portfolio footer">
               <div className="site-footer-main">
                 <div>
                   <p className="footer-eyebrow">Portfolio Footer</p>
@@ -558,6 +727,7 @@ export default function App() {
                     </a>
                   ))}
                 </div>
+
               </div>
 
               <p className="footer-copy">
